@@ -5,6 +5,9 @@ Stacked + fragmented implementation of settings.py
 Simply create a settings.py file and add::
     >>> __import__('settingsd').replace(__name__)
 
+or append __init__.py with::
+    >>> settings = __import__('settingsd').install(__name__)
+
 Modify __path__ (but do NOT replace!) in fragments to alter the search path.
 """
 
@@ -116,6 +119,8 @@ class Settingsd(collections.Mapping, types.ModuleType):
     def show(self, prefix='[settings.d]', file=None):
         pfx = prefix and (str(prefix) + ' ') or ''
         fp = file or sys.stderr
+        # ensure something to show
+        self.configured or self()
 
         # dump PATHS
         print(pfx + 'PATH:', file=fp)
@@ -231,5 +236,29 @@ def replace(module):
         raise TypeError('{0} must have a __name__'.format(module))
 
     settings = sys.modules[module.__name__] = Settingsd(vars(module))
+    settings.origin = module
+    return settings
+
+
+def install(module, **kwds):
+    if not hasattr(module, '__name__'):
+        module = sys.modules[module]
+    if not hasattr(module, '__name__'):
+        raise TypeError('{0} must have a __name__'.format(module))
+
+    ns = vars(module).copy()
+    name = ns.pop('__name__')
+    file = ns.pop('__file__')
+    path = ns.pop('__path__')
+    name = name + '.settings'
+    if file:
+        file = os.path.abspath(file)
+        file = os.path.dirname(file)
+        file = os.path.join(file, 'settings.py')
+    ns['__name__'] = name
+    ns['__file__'] = file
+    ns.update(kwds)
+
+    settings = sys.modules[name] = Settingsd(ns)
     settings.origin = module
     return settings
