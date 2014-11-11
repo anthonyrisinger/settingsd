@@ -151,6 +151,14 @@ class Settingsd(collections.Mapping, types.ModuleType):
             out = pfx + '    {0:.<{1}} {2}'.format(key, maxlen, joins)
             print(out, file=fp)
 
+    def __dir__(self):
+        try:
+            keys = super(Settingsd, self).__dir__()
+        except AttributeError:
+            keys = dir(self.conf)
+        keys.extend(self.conf)
+        return keys
+
     def __getattr__(self, key):
         self.configured or self()
         for k in (key, key.upper()):
