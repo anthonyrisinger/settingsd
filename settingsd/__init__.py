@@ -69,7 +69,7 @@ class Settingsd(collections.Mapping, types.ModuleType):
             filename = self.__file__.strip('co')
             if filename.endswith('.py'):
                 search = os.path.abspath(filename[:-2] + 'd')
-                if os.path.isdir(search):
+                if os.path.isdir(search) or hasattr(self, '__loader__'):
                     self.__path__.append(search)
 
     def __enter__(self):
@@ -98,10 +98,17 @@ class Settingsd(collections.Mapping, types.ModuleType):
             dist = collections.defaultdict(list)
             path = collections.defaultdict(list)
             for importer, name, is_pkg in iter_modules(self.__path__):
-                fqm[name] = importer.path
+                try:
+                    fqm[name] = importer.path
+                except AttributeError:
+                    # zip packages
+                    fqm[name] = os.path.join(
+                        importer.archive,
+                        importer.prefix,
+                        ).rstrip('/')
                 loader = importer.find_module(name)
-                ctx['__file__'] = loader.filename
-                exec loader.get_code() in ctx
+                ctx['__file__'] = loader.get_filename(name)
+                exec loader.get_code(name) in ctx
                 while ctx.trip2:
                     dist[ctx.trip2.pop()].append(name)
             for k, v in sorted(dist.items()):
