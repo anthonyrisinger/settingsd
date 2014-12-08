@@ -68,11 +68,8 @@ class Settingsd(collections.Mapping, types.ModuleType):
             )
         self.__dict__.update(defaults)
         if not self.__path__ and self.__file__:
-            filename = self.__file__.strip('co')
-            if filename.endswith('.py'):
-                search = os.path.abspath(filename[:-2] + 'd')
-                if os.path.isdir(search) or hasattr(self, '__loader__'):
-                    self.__path__.append(search)
+            filename = locators.default(self)
+            self.__path__.append(filename)
 
     def __enter__(self):
         sys.modules[self.__name__] = self
