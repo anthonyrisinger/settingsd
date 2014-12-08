@@ -26,6 +26,8 @@ import os.path
 import collections
 import re
 
+from . import locators
+
 
 class Globals(dict):
 
@@ -186,6 +188,21 @@ class Settingsd(collections.Mapping, types.ModuleType):
 
     def __len__(self):
         return len(self.conf)
+
+    def append(self, path, **kwds):
+        if hasattr(path, '__call__'):
+            path = path(self, path, **kwds)
+        if path.startswith('@'):
+            path = path.lstrip('@')
+            path = getattr(locators, path)(self, **kwds)
+        path = os.path.abspath(path)
+        self.__path__.append(path)
+        return self
+
+    def extend(self, paths, **kwds):
+        for path in paths:
+            self.append(path, **kwds)
+        return self
 
     def trace(self, key=None):
         if key is not None:
