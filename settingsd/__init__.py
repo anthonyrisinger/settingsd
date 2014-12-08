@@ -100,6 +100,8 @@ class Settingsd(collections.Mapping, types.ModuleType):
             dist = collections.defaultdict(list)
             path = collections.defaultdict(list)
             for importer, name, is_pkg in iter_modules(self.__path__):
+                loader = importer.find_module(name)
+                index, hint, key = _name_to_parts(name)
                 try:
                     fqm[name] = importer.path
                 except AttributeError:
@@ -108,9 +110,13 @@ class Settingsd(collections.Mapping, types.ModuleType):
                         importer.archive,
                         importer.prefix,
                         ).rstrip('/')
-                loader = importer.find_module(name)
                 ctx['__file__'] = loader.get_filename(name)
-                exec loader.get_code(name) in ctx
+                if hint == 'code':
+                    exec loader.get_code(name) in ctx
+                if hint == 'path':
+                    ctx[key] = loader.get_filename(name)
+                if hint == 'file':
+                    ctx[key] = loader.get_data(ctx['__file__'])
                 while ctx.trip2:
                     dist[ctx.trip2.pop()].append(name)
             for k, v in sorted(dist.items()):
@@ -229,18 +235,40 @@ class Settingsd(collections.Mapping, types.ModuleType):
         return bool(self.conf)
 
 
+def _name_to_parts(name):
+    matcher = re.compile('^([0-9]+)(@[^-]+)?-(.+)')
+    match = matcher.match(name)
+    if not match:
+        return None
+
+    index = match.group(1)
+    hint = match.group(2)
+    key = match.group(3)
+    if index is not None:
+        index = int(index)
+    if hint is not None:
+        hint = hint.lstrip('@')
+    else:
+        hint = 'code'
+    if key is not None:
+        key = re.sub('[^0-9A-Za-z]', '_', key)
+        key = re.sub('_{2,}', '_', key)
+        key = key.upper()
+
+    parts = (index, hint, key)
+    return parts
+
+
 def iter_modules(paths):
     """
     similar to pkgutil.iter_modules, but allows path to change/update
     """
     def regen(paths, cache_in, cache_out):
-        matcher = re.compile('^([0-9]+)-(.+)')
         for importer, name, is_pkg in pkgutil.iter_modules(paths):
-            match = matcher.match(name)
-            if not match:
+            key = _name_to_parts(name)
+            if not key:
                 continue
 
-            key = (int(match.group(1)), match.group(2))
             if key not in cache_out:
                 cache_in[key] = (importer, name, is_pkg)
 
