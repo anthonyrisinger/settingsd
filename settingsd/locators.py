@@ -22,7 +22,10 @@ def root(settings, path, create=True, mode=0644):
     path_root = os.path.join(path, *parts)
     path_root = os.path.abspath(path_root)
     if create and not os.path.exists(path_root):
-        os.makedirs(path_root, mode=mode)
+        try:
+            os.makedirs(path_root, mode=mode)
+        except OSError:
+            pass
 
     return path_root
 
@@ -46,7 +49,10 @@ def home(settings, path=None, create=True, mode=0644, xdg=True):
     path_home = os.path.join(path_home, *parts)
     path_home = os.path.abspath(path_home)
     if create and not os.path.exists(path_home):
-        os.makedirs(path_home, mode=mode)
+        try:
+            os.makedirs(path_home, mode=mode)
+        except OSError:
+            pass
 
     return path_home
 
@@ -65,6 +71,9 @@ def default(settings, path=None, create=True, mode=0644):
     path_file = os.path.join(path_file, *parts)
     path_file = os.path.abspath(path_file)
     if create and not os.path.exists(path_file):
-        os.makedirs(path_file, mode=mode)
+        try:
+            os.makedirs(path_file, mode=mode)
+        except OSError:
+            pass
 
     return path_file
