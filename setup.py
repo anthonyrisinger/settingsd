@@ -7,7 +7,7 @@ from setuptools import setup
 setup(
     zip_safe=True,
     name='settingsd',
-    version='0.3.4',
+    version='0.3.5',
     description='settings.d',
     long_description='settings.d',
     url='https://github.com/xtfxme/settingsd',
