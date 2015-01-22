@@ -92,11 +92,16 @@ class Settingsd(collections.Mapping, types.ModuleType):
         if self.configured:
             return self
 
+        # submodules added to sys.modules on success
+        subs = dict()
+
         with self as ctx:
             fqm = dict()
             dist = collections.defaultdict(list)
             path = collections.defaultdict(list)
             for importer, name, is_pkg in iter_modules(self.__path__):
+                subname = self.__name__ + '.' + name
+                sub = subs[subname] = types.ModuleType(subname)
                 loader = importer.find_module(name)
                 index, hint, key = _name_to_parts(name)
                 try:
@@ -107,7 +112,7 @@ class Settingsd(collections.Mapping, types.ModuleType):
                         importer.archive,
                         importer.prefix,
                         ).rstrip('/')
-                ctx['__file__'] = loader.get_filename(name)
+                ctx['__file__'] = sub.__file__ = loader.get_filename(name)
                 if hint == 'code':
                     exec loader.get_code(name) in ctx
                 if hint == 'path':
@@ -115,7 +120,10 @@ class Settingsd(collections.Mapping, types.ModuleType):
                 if hint == 'file':
                     ctx[key] = loader.get_data(ctx['__file__'])
                 while ctx.trip2:
-                    dist[ctx.trip2.pop()].append(name)
+                    t2 = ctx.trip2.pop()
+                    dist[t2].append(name)
+                    setattr(sub, t2, ctx[t2])
+                setattr(self, name, sub)
             for k, v in sorted(dist.items()):
                 self.dist[k] = tuple(v)
                 path[fqm[v.pop()]].append(k)
@@ -124,8 +132,10 @@ class Settingsd(collections.Mapping, types.ModuleType):
             map(ctx.pop, set(ctx.keys()) - ctx.trip1)
             self.configure(**ctx)
 
-        sep = '\n    '
-        self.__file__ = sep + sep.join(self.__path__) + sep
+        # settings are loaded!
+        sys.modules.update(subs)
+        self.__file__ = None
+
         return self
 
     def show(self, prefix='[settings.d]', file=None):
