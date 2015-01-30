@@ -86,7 +86,9 @@ class Settingsd(collections.OrderedDict):
             return
 
         supr = super(Settingsd, self)
-        if key.isupper() and (key not in self or attr is not self[key]):
+        if key.isupper() and not key[0].isdigit() and (
+                key not in self or attr is not self[key]
+                ):
             # record this SETTINGS_KEY
             part = self.part[-1]
             partname = part.__name__.rsplit('.', 1)[-1]
