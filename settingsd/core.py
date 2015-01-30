@@ -92,8 +92,8 @@ class Settingsd(collections.OrderedDict):
     def instance(self):
         # derive a name for our custom subclass
         name = self['__name__'].replace('.', ' ').title().replace(' ', '')
-        key = self.get('SETTINGSD_NS_KEY', defaults.SETTINGSD_NS_KEY)
-        bases = self.get('SETTINGSD_BASES', defaults.SETTINGSD_BASES)
+        key = utils.getopt(self, 'SETTINGSD_NS_KEY', ns=True)
+        bases = utils.getopt(self, 'SETTINGSD_BASES', ns=True)
         bases = utils.resolve_bases(self, bases)
         # construct said subclass and instantiate
         #FIXME: should class and/or instance be cached?
