@@ -62,11 +62,22 @@ class Settingsd(collections.OrderedDict):
         super(Settingsd, self).__init__(ns)
         self.__import__()
 
-    def __getitem__(self, key):
-        supr = super(Settingsd, self)
-        #TODO: defaults.key
-        # default to None for SETTINGS_KEYS
-        item = supr.get(key) if key.isupper() else supr.__getitem__(key)
+    def __getitem__(self, key, getopt=True):
+        if not getopt:
+            item = super(Settingsd, self).__getitem__(key)
+            return item
+
+        try:
+            item = utils.getopt(
+                self, key,
+                strict=not key.isupper(),
+                copy=True,
+                update=True,
+                ns=True,
+                )
+        except AttributeError as e:
+            raise KeyError(key)
+
         return item
 
     def __setitem__(self, key, attr):

@@ -79,7 +79,10 @@ def resolve_import(settings, importable):
 def getopt(settings, key, strict=False, copy=False, update=False, ns=False):
     ns = settings if ns else namespace(settings)
     if key in ns:
-        return ns[key]
+        try:
+            return ns.__getitem__(key, getopt=False)
+        except TypeError:
+            return ns.__getitem__(key)
 
     from . import defaults
 
