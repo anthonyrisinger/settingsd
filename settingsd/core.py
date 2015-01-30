@@ -63,14 +63,12 @@ class Settingsd(collections.OrderedDict):
         super(Settingsd, self).__init__(ns)
         self.__import__()
 
-    def __getitem__(self, key, getopt=True):
-        if not getopt:
-            item = super(Settingsd, self).__getitem__(key)
-            return item
-
+    def __getitem__(self, key):
         try:
+            # pass super(...) object because getopt will try to self[key]
+            supr = super(Settingsd, self)
             item = utils.getopt(
-                self, key,
+                supr, key,
                 strict=not key.isupper(),
                 copy=True,
                 update=True,
