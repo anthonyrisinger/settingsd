@@ -6,6 +6,8 @@ Loaders
 from __future__ import absolute_import
 from __future__ import print_function
 
+import collections
+
 from . import utils
 
 
@@ -49,7 +51,17 @@ def python(settings, keys):
     return True
 
 
-class json(object):
+def json(settings, keys):
+    ns = utils.namespace(settings)
+    #TODO: zip files
+    with open(keys['uri']) as fp:
+        from json import load
+        new_ns = load(fp=fp, object_hook=collections.OrderedDict)
+    ns.update(new_ns)
+    return True
+
+
+class JSONLoader(object):
 
     def __init__(self, settings, keys):
         self.keys = keys
@@ -60,9 +72,9 @@ class json(object):
             return self
 
         if not self.cache:
-            from json import load
             #TODO: zip files
             with open(self.keys['uri']) as fp:
+                from json import load
                 self.cache = load(fp=fp)
         return self.cache
 
