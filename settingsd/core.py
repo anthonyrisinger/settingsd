@@ -86,6 +86,7 @@ class Settingsd(collections.OrderedDict):
                 self.path[partpath] = list()
             self.dist[key].append(partname)
             self.path[partpath].append(key)
+            setattr(part, key, attr)
         supr.__setitem__(key, attr)
 
     @property
