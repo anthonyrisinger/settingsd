@@ -59,6 +59,7 @@ class Settingsd(collections.OrderedDict):
         self.part = [part]
         self.dist = collections.OrderedDict()
         self.path = collections.OrderedDict()
+        self.type_overrides = dict()
         super(Settingsd, self).__init__(ns)
         self.__import__()
 
@@ -109,9 +110,10 @@ class Settingsd(collections.OrderedDict):
         key = utils.getopt(self, 'SETTINGSD_NS_KEY', ns=True)
         bases = utils.getopt(self, 'SETTINGSD_BASES', ns=True)
         bases = utils.resolve_bases(self, bases)
+        attrs = dict(self, **self.type_overrides)
         # construct said subclass and instantiate
         #FIXME: should class and/or instance be cached?
-        settings = type(name, bases, self)
+        settings = type(name, bases, attrs)
         settings.__module__ = self['__package__']
         settings = settings()
         if key:
@@ -138,7 +140,8 @@ class Settingsd(collections.OrderedDict):
                     # python code in our namespace, but the loader might also
                     # be a descriptor designed to handle a single key
                     if hasattr(loader, '__get__'):
-                        self[info['key']] = loader
+                        self.type_overrides[info['key']] = loader
+                        self[info['key']] = info['uri']
                     # loader found and done processing part
                     break
             if not loader:
