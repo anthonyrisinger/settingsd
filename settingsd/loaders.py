@@ -6,8 +6,6 @@ Loaders
 from __future__ import absolute_import
 from __future__ import print_function
 
-import collections
-
 from . import utils
 
 
@@ -56,8 +54,10 @@ def json(settings, keys):
     #TODO: zip files
     with open(keys['uri']) as fp:
         from json import load
-        new_ns = load(fp=fp, object_hook=collections.OrderedDict)
-    ns.update(new_ns)
+        new_ns = load(fp=fp)
+    # ensure stable load ordering
+    for k in new_ns:
+        ns[k] = new_ns[k]
     return True
 
 
