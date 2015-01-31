@@ -66,9 +66,11 @@ class Settingsd(Namespace, collections.OrderedDict):
         self.dist = collections.OrderedDict()
         self.path = collections.OrderedDict()
         self.type_overrides = dict()
+        super(Settingsd, self).__init__(ns)
         # MUST be in __dict__ so getattr(...) works!
-        ns_key = utils.getopt(self, 'SETTINGSD_NS_KEY')
-        super(Settingsd, self).__init__(ns, SETTINGSD_NS_KEY=ns_key)
+        if 'SETTINGSD_NS_KEY' not in self:
+            ns_key = utils.getopt(self, 'SETTINGSD_NS_KEY')
+            self['SETTINGSD_NS_KEY'] = ns_key
         self.__import__()
 
     def __getitem__(self, key):
