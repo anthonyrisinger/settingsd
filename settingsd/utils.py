@@ -22,7 +22,10 @@ def namespace(settings):
         # already a namespace
         return settings
 
-    key = getopt(settings, 'SETTINGSD_NS_KEY')
+    # expected to exist if passed anything else
+    # since this defaults to __dict__, the getattr(...) call works without
+    # any setup for settingsd.core.BaseSettings objects!
+    key = getattr(settings, 'SETTINGSD_NS_KEY')
     ns = getattr(settings, key)
     return ns
 
