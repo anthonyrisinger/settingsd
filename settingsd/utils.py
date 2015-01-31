@@ -76,20 +76,13 @@ def resolve_import(settings, importable):
     return importable
 
 
-def getopt(settings, key, strict=False, copy=False, update=False, ns=False):
+def getopt(settings, key, strict=False, copy=False):
     """
-    Get an option from settings or defaults with optional copy/update
+    Get an option from settings or defaults with optional copy
     """
     from . import defaults
 
-    if ns:
-        ns = settings
-    else:
-        # can't use namespace(...) here else recursion
-        ns_key = defaults.SETTINGSD_NS_KEY
-        ns_key = getattr(settings, 'SETTINGSD_NS_KEY', ns_key)
-        ns = getattr(settings, ns_key)
-
+    ns = namespace(settings)
     if ns.__contains__(key):
         return ns.__getitem__(key)
 
@@ -101,8 +94,6 @@ def getopt(settings, key, strict=False, copy=False, update=False, ns=False):
     if copy:
         from copy import deepcopy
         default = deepcopy(default)
-    if update:
-        ns.__setitem__(key, default)
 
     return default
 

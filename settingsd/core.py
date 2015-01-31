@@ -77,8 +77,6 @@ class Settingsd(Namespace, collections.OrderedDict):
                 supr, key,
                 strict=not key.isupper(),
                 copy=True,
-                update=True,
-                ns=True,
                 )
         except AttributeError as e:
             raise KeyError(key)
@@ -111,8 +109,8 @@ class Settingsd(Namespace, collections.OrderedDict):
     def instance(self):
         # derive a name for our custom subclass
         name = self['__name__'].replace('.', ' ').title().replace(' ', '')
-        key = utils.getopt(self, 'SETTINGSD_NS_KEY', ns=True)
-        bases = utils.getopt(self, 'SETTINGSD_BASES', ns=True)
+        key = utils.getopt(self, 'SETTINGSD_NS_KEY')
+        bases = utils.getopt(self, 'SETTINGSD_BASES')
         bases = utils.resolve_bases(self, bases)
         attrs = dict(self, **self.type_overrides)
         # construct said subclass and instantiate
@@ -137,7 +135,7 @@ class Settingsd(Namespace, collections.OrderedDict):
 
             # search each loader in order until a match is found
             loader = None
-            for loader in utils.getopt(self, 'SETTINGSD_LOADERS', ns=True):
+            for loader in utils.getopt(self, 'SETTINGSD_LOADERS'):
                 loader = utils.resolve_import(self, loader)(self, info)
                 if loader:
                     # loader could be a simple function, such as executing
