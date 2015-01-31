@@ -15,6 +15,12 @@ from . import defaults
 from . import utils
 
 
+class Namespace(object):
+
+    # used by utils.getopt(...) to prevent recursion
+    SETTINGSD_NAMESPACE = True
+
+
 #FIXME: issubclass(BaseSettings, types.ModuleType)
 class BaseSettings(object):
     """
@@ -44,7 +50,7 @@ class BaseSettings(object):
         return rv
 
 
-class Settingsd(collections.OrderedDict):
+class Settingsd(Namespace, collections.OrderedDict):
 
     # these can also be imported by user code
     from .api import show

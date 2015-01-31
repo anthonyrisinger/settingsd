@@ -18,7 +18,7 @@ def namespace(settings):
     """
     Return the namespace associated with these settings
     """
-    if isinstance(settings, dict):
+    if getattr(settings, 'SETTINGSD_NAMESPACE', False):
         # already a namespace
         return settings
 
