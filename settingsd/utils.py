@@ -106,7 +106,7 @@ def keys_from_uri(uri):
     keys['head'], keys['tail'] = os.path.split(keys['uri'])
     keys['name'], keys['ext'] = os.path.splitext(keys['tail'])
     keys['mime'] = mimetypes.guess_type(keys['tail'])[0]
-    matcher = re.compile('^([0-9]+)[-_](.+)$')
+    matcher = re.compile('^_?([0-9]+)[-_](.+)$')
     match = matcher.match(keys['name'])
     if not match:
         return None
