@@ -85,6 +85,7 @@ class Settingsd(Namespace, collections.OrderedDict):
 
     def __setitem__(self, key, attr):
         if key == '__doc__':
+            # TODO: record each parts doc (JSON/etc) and assemble at end
             self.part[-1].__doc__ = attr and attr.strip()
             return
 
