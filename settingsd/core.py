@@ -67,10 +67,6 @@ class Settingsd(Namespace, collections.OrderedDict):
         self.path = collections.OrderedDict()
         self.type_overrides = dict()
         super(Settingsd, self).__init__(ns)
-        # MUST be in __dict__ so getattr(...) works!
-        if 'SETTINGSD_NS_KEY' not in self:
-            ns_key = utils.getopt(self, 'SETTINGSD_NS_KEY')
-            self['SETTINGSD_NS_KEY'] = ns_key
         self.__import__()
 
     def __getitem__(self, key):
@@ -117,6 +113,9 @@ class Settingsd(Namespace, collections.OrderedDict):
         bases = utils.getopt(self, 'SETTINGSD_BASES')
         bases = utils.resolve_bases(self, bases)
         attrs = dict(self, **self.type_overrides)
+        if not attrs.get('SETTINGSD_NS_KEY'):
+            # avoid recursion in utils.(namespace|getopt)
+            attrs['SETTINGSD_NS_KEY'] = key
         # construct said subclass and instantiate
         #FIXME: should class and/or instance be cached?
         settings = type(name, bases, attrs)
@@ -150,6 +149,7 @@ class Settingsd(Namespace, collections.OrderedDict):
                         self[info['key']] = info['uri']
                     # loader found and done processing part
                     break
+
             if not loader:
                 # unable to find a specialty loader; store the path
                 self[info['key']] = info['uri']
