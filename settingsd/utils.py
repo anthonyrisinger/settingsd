@@ -23,7 +23,7 @@ def namespace(settings):
         return settings
 
     # expected to exist if passed anything else
-    key = getattr(settings, 'SETTINGSD_NS_KEY')
+    key = getattr(settings, 'SETTINGSD_NS')
     ns = getattr(settings, key)
     return ns
 

@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 
-SETTINGSD_NS_KEY = '__dict__'
+SETTINGSD_NS = '__dict__'
 
 SETTINGSD_BASES = ['settingsd.core:BaseSettings']
 

@@ -109,13 +109,13 @@ class Settingsd(Namespace, collections.OrderedDict):
     def instance(self):
         # derive a name for our custom subclass
         name = self['__name__'].replace('.', ' ').title().replace(' ', '')
-        key = utils.getopt(self, 'SETTINGSD_NS_KEY')
+        key = utils.getopt(self, 'SETTINGSD_NS')
         bases = utils.getopt(self, 'SETTINGSD_BASES')
         bases = utils.resolve_bases(self, bases)
         attrs = dict(self, **self.type_overrides)
-        if not attrs.get('SETTINGSD_NS_KEY'):
+        if not attrs.get('SETTINGSD_NS'):
             # avoid recursion in utils.(namespace|getopt)
-            attrs['SETTINGSD_NS_KEY'] = key
+            attrs['SETTINGSD_NS'] = key
         # construct said subclass and instantiate
         #FIXME: should class and/or instance be cached?
         settings = type(name, bases, attrs)
