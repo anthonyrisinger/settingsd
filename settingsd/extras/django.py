@@ -15,7 +15,10 @@ def fallback_to_defaults(settings, key):
     from django.conf import settings as djsettings
 
     if not djsettings.configured:
-        ns = utils.namespace(settings)
+        # this is __getattr__ usually, so use super(...)
+        # to avoid recursion on SETTINGSD_NAMESPACE
+        supr = super(settings.__class__, settings)
+        ns = utils.namespace(supr)
         djsettings.configure(ns)
     if not apps.ready:
         django.setup()
