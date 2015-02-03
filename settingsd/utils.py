@@ -178,10 +178,10 @@ def settings_from_ns(ns, update=True):
     """
     Assemble settings from a namespace
     """
-    from . import core
+    from . import base
 
     # assemble settings
-    settings_ns = core.Settingsd(ns)
+    settings_ns = base.Settingsd(ns)
     settings = settings_ns.instance
 
     if update:

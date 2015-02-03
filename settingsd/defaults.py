@@ -9,7 +9,7 @@ from __future__ import print_function
 
 SETTINGSD_NS = '__dict__'
 
-SETTINGSD_BASES = ['settingsd.core:BaseSettings']
+SETTINGSD_BASES = ['settingsd.base:BaseSettings']
 
 SETTINGSD_LOADERS = [
     'settingsd.loaders:from_name',
