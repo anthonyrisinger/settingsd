@@ -20,5 +20,8 @@ setup(
         'Programming Language :: Python',
         'Intended Audience :: Developers',
         ],
-    packages=['settingsd'],
+    packages=[
+        'settingsd',
+        'settingsd.extras',
+        ],
     )
