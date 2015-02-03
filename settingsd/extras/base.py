@@ -21,10 +21,8 @@ class KeyMoved(object):
         if settings is None:
             return self
 
-        ns = utils.namespace(settings)
-        attr = ns[self.key]
+        attr = getattr(settings, self.key)
         return attr
 
     def __set__(self, settings, value):
-        ns = utils.namespace(settings)
-        ns[self.key] = value
+        setattr(settings, self.key, value)
