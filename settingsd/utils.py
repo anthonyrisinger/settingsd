@@ -122,8 +122,6 @@ def ns_prepare(sources, install=True):
     """
     Unify an arbitrary number of sources into a namespace
     """
-    from . import path
-
     ns = collections.OrderedDict()
     for source in sources:
         # if already a dict, do nothing
@@ -161,6 +159,7 @@ def ns_prepare(sources, install=True):
     if '__path__' not in ns:
         ns['__path__'] = list()
         if ns['__file__']:
+            from . import path
             item = path.default(ns)
             ns['__path__'].append(item)
 
