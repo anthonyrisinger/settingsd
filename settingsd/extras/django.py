@@ -14,15 +14,16 @@ def fallback_to_defaults(settings, key):
     from django.apps import apps
     from django.conf import settings as djsettings
 
+    if not key.isupper() or key.startswith('SETTINGSD_'):
+        # FIXME: need to call super(...) first somehow
+        raise AttributeError(key)
+
     if not djsettings.configured:
         # this is __getattr__ usually, so use super(...)
         # to avoid recursion on SETTINGSD_NAMESPACE
         supr = super(settings.__class__, settings)
         ns = utils.namespace(supr)
-        djsettings.configure(ns)
-    if not apps.ready:
-        import django
-        django.setup()
+        djsettings.configure(**ns)
 
     attr = getattr(djsettings, key)
     return attr
@@ -70,12 +71,13 @@ class ConfigureApps(object):
         if settings is None:
             return self
 
+        import django
         from django.apps import apps
         from django.conf import settings as djsettings
 
         if not djsettings.configured:
             ns = utils.namespace(settings)
-            djsettings.configure(ns)
+            djsettings.configure(**ns)
         if not apps.ready:
             django.setup()
 
