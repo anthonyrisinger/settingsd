@@ -21,6 +21,7 @@ def fallback_to_defaults(settings, key):
         ns = utils.namespace(supr)
         djsettings.configure(ns)
     if not apps.ready:
+        import django
         django.setup()
 
     attr = getattr(djsettings, key)
