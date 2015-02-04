@@ -19,10 +19,7 @@ def fallback_to_defaults(settings, key):
         raise AttributeError(key)
 
     if not djsettings.configured:
-        # this is __getattr__ usually, so use super(...)
-        # to avoid recursion on SETTINGSD_NAMESPACE
-        supr = super(settings.__class__, settings)
-        ns = utils.namespace(supr)
+        ns = utils.namespace(settings)
         djsettings.configure(**ns)
 
     attr = getattr(djsettings, key)
