@@ -125,6 +125,16 @@ class Settingsd(Namespace, collections.OrderedDict):
         if key:
             #FIXME: would Falsey lead to GC self???
             setattr(settings, key, self)
+
+        # if user defined ready(...), call it now
+        if hasattr(settings, 'ready'):
+            if hasattr(settings.ready, '__call__'):
+                # FIXME: functions in __dict__ shadow methods on __class__!
+                if hasattr(settings.ready, '__self__'):
+                    settings.ready()
+                else:
+                    settings.ready(settings)
+
         return settings
 
     def __import__(self):

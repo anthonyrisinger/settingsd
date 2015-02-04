@@ -9,6 +9,13 @@ from __future__ import print_function
 from .. import utils
 
 
+def configure_on_ready(settings):
+    from django.conf import settings as djsettings
+    if not djsettings.configured:
+        ns = utils.namespace(settings)
+        djsettings.configure(**ns)
+
+
 # TODO: should probably call super(...) somehow?
 def fallback_to_defaults(settings, key):
     from django.apps import apps
