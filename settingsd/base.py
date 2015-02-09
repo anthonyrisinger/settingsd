@@ -214,3 +214,46 @@ class Settingsd(Namespace, collections.OrderedDict):
                     cache_in,
                     cache_out,
                     )
+
+
+class MethodFromDictFunction(object):
+
+    def __init__(self, key):
+        self.key = key
+
+    def __get__(self, settings, owner):
+        if settings is None:
+            return self
+
+        ns = utils.namespace(settings)
+        fun = ns[self.key]
+        # all functions are descriptors that bind to the instance
+        method = fun.__get__(settings, settings.__class__)
+        return method
+
+    def __set__(self, settings, attr):
+        raise AttributeError("can't set attribute")
+
+
+def _find_and_proxy_methods(attrs):
+    for fun_name, fun in attrs.items():
+        if fun_name.startswith('__') and fun_name.endswith('__'):
+            # leave it alone
+            continue
+
+        if not hasattr(fun, '__call__'):
+            # not a callable
+            continue
+
+        if not hasattr(fun, '__globals__'):
+            # not a function
+            continue
+
+        if hasattr(fun, '__self__'):
+            # already bound to something else
+            continue
+
+        # this thing looks like a function intended to be a method
+        attrs[fun_name] = MethodFromDictFunction(fun_name)
+
+    return attrs
