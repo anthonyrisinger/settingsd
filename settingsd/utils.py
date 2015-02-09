@@ -169,7 +169,7 @@ def ns_prepare(sources, install=True):
         ns['__path__'][i] = item
 
     #TODO: necessary or just nice repr(...)?
-    ns.pop('__builtins__')
+    ns.pop('__builtins__', None)
     return ns
 
 
