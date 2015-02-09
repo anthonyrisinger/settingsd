@@ -117,6 +117,8 @@ class Settingsd(Namespace, collections.OrderedDict):
         if not attrs.get('SETTINGSD_NS'):
             # avoid recursion in utils.(namespace|getopt)
             attrs['SETTINGSD_NS'] = key
+        # functions in __dict__ shadow those in __class__
+        attrs = _find_and_proxy_methods(attrs)
         # construct said subclass and instantiate
         #FIXME: should class and/or instance be cached?
         settings = type(name, bases, attrs)
@@ -129,11 +131,7 @@ class Settingsd(Namespace, collections.OrderedDict):
         # if user defined ready(...), call it now
         if hasattr(settings, 'ready'):
             if hasattr(settings.ready, '__call__'):
-                # FIXME: functions in __dict__ shadow methods on __class__!
-                if hasattr(settings.ready, '__self__'):
-                    settings.ready()
-                else:
-                    settings.ready(settings)
+                settings.ready()
 
         return settings
 
