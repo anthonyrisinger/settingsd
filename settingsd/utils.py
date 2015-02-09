@@ -132,6 +132,13 @@ def ns_prepare(sources, install=True):
             # maybe we have a module
             if hasattr(source, '__dict__'):
                 source = source.__dict__
+                if install:
+                    # if not replacing, we only want a couple attrs
+                    source = {
+                        '__name__': source.get('__name__'),
+                        '__file__': source.get('__file__'),
+                        '__package__': source.get('__package__'),
+                        }
         # assume we have something compatible (iterator, dict, etc)
         ns.update(source)
 
