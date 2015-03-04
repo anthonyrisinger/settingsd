@@ -9,8 +9,8 @@ from __future__ import print_function
 from . import utils
 
 
-def from_name(settings, keys):
-    loader = _load_from(settings, keys, 'name')
+def from_key(settings, keys):
+    loader = _load_from(settings, keys, 'key')
     return loader
 
 
