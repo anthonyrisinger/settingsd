@@ -81,6 +81,10 @@ class Settingsd(Namespace, collections.OrderedDict):
         except AttributeError as e:
             raise KeyError(key)
 
+        # FIXME: if we dont self[key] = item, users are unable to override
+        # SETTINGSD_* config, even though we just copied it :(
+        # should we do this for all keys, SETTINGSD_* keys, or expect the
+        # user to do it manually?
         return item
 
     def __setitem__(self, key, attr):
