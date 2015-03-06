@@ -38,16 +38,18 @@ class LocateApps(object):
     Proxies settings.app directly to django.apps
     """
 
-    def __init__(self, app=None):
+    def __init__(self, app=None, models=True):
         self.__app = app
+        self.__models = models
 
     def __getattr__(self, key):
         from django.apps import apps
         if self.__app:
             attr = apps.get_model(self.__app.label, key)
         else:
-            conf = apps.get_app_config(key)
-            attr = self.__class__(app=conf)
+            attr = apps.get_app_config(key)
+            if self.__models:
+                attr = self.__class__(app=attr, models=self.__models)
         # cache attr lookup
         setattr(self, key, attr)
         return attr
@@ -71,9 +73,16 @@ class LocateApps(object):
 
 class ConfigureApps(object):
 
+    def __init__(self, models=True):
+        self.configured = False
+        self.models = models
+
     def __get__(self, settings, owner):
         if settings is None:
             return self
+
+        if self.configured:
+            return LocateApps(models=self.models)
 
         import django
         from django.apps import apps
@@ -85,7 +94,8 @@ class ConfigureApps(object):
         if not apps.ready:
             django.setup()
 
-        return LocateApps()
+        self.configured = True
+        return LocateApps(models=self.models)
 
     def __set__(self, settings, value):
         raise AttributeError("can't set attribute")
