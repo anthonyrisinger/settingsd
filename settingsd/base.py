@@ -85,6 +85,8 @@ class Settingsd(Namespace, collections.OrderedDict):
         # SETTINGSD_* config, even though we just copied it :(
         # should we do this for all keys, SETTINGSD_* keys, or expect the
         # user to do it manually?
+        if key.startswith('SETTINGSD_'):
+            self[key] = item
         return item
 
     def __setitem__(self, key, attr):
@@ -95,7 +97,7 @@ class Settingsd(Namespace, collections.OrderedDict):
 
         supr = super(Settingsd, self)
         if key.isupper() and not key[0].isdigit() and (
-                key not in self or attr is not self[key]
+                key not in self or attr is not self.get(key)
                 ):
             # record this SETTINGS_KEY
             part = self.part[-1]
