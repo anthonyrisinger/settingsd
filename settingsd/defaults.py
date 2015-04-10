@@ -13,6 +13,7 @@ SETTINGSD_BASES = ['settingsd.base:BaseSettings']
 
 SETTINGSD_FINDERS = [
     'settingsd.finders:directory',
+    'settingsd.finders:zipfile',
     ]
 
 SETTINGSD_LOADERS = [

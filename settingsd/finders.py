@@ -27,3 +27,30 @@ def directory(settings, path):
         parts.append(part)
 
     return parts
+
+
+def zipfile(settings, path):
+    import zipimport
+
+    try:
+        # abuse zipimport over zipfile because it's faster and potentially
+        # cached if we are already operating/importing from the archive
+        importer = zipimport.zipimporter(path)
+    except zipimport.ZipImportError:
+        return None
+
+    parts = list()
+    for info in importer._files.values():
+        if not info[0].startswith(path):
+            # random item in archive we don't care about
+            continue
+
+        part = {'uri': info[0]}
+
+        def get_data(part=part):
+            return importer.get_data(part['uri'])
+
+        part['get_data'] = get_data
+        parts.append(part)
+
+    return parts
