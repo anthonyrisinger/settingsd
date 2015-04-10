@@ -180,21 +180,21 @@ class Settingsd(Namespace, collections.OrderedDict):
         """
         def regen(paths, cache_in, cache_out):
             for path in paths:
-                try:
-                    #TODO: delegate to Adapters
-                    parts = [
-                        os.path.join(path, part)
-                        for part in os.listdir(path)
-                        ]
-                except OSError:
-                    #TODO: handle zip packages
+                parts = None
+                for finder in utils.getopt(self, 'SETTINGSD_FINDERS'):
+                    parts = utils.resolve_import(self, finder)(self, path)
+                    if parts not in (None, False):
+                        break
+
+                if not parts:
                     continue
 
                 for part in parts:
-                    keys = utils.keys_from_uri(part)
+                    keys = utils.keys_from_uri(part['uri'])
                     if not keys:
                         continue
 
+                    keys.update(part)
                     cache_key = (keys['index'], keys['name'])
                     if cache_key not in cache_out:
                         cache_in[cache_key] = keys

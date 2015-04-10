@@ -38,10 +38,8 @@ def _load_from(settings, keys, suffix):
 
 def python(settings, keys):
     ns = utils.namespace(settings)
-    #TODO: zip files
-    with open(keys['uri']) as fp:
-        code = fp.read()
     #TODO: SETTINGSD_COMPILE_FLAGS
+    code = keys['get_data']()
     code = compile(code, keys['uri'], 'exec')
     # eval can handle code objects compiled with exec (python[23])
     eval(code, ns)
@@ -50,11 +48,10 @@ def python(settings, keys):
 
 
 def json(settings, keys):
+    from json import loads
     ns = utils.namespace(settings)
-    #TODO: zip files
-    with open(keys['uri']) as fp:
-        from json import load
-        new_ns = load(fp=fp)
+    data = keys['get_data']()
+    new_ns = loads(data)
     # ensure stable load ordering
     for k in new_ns:
         ns[k] = new_ns[k]
@@ -72,10 +69,10 @@ class JSONLoader(object):
             return self
 
         if not self.cache:
-            #TODO: zip files
-            with open(self.keys['uri']) as fp:
-                from json import load
-                self.cache = load(fp=fp)
+            from json import loads
+            data = keys['get_data']()
+            self.cache = loads(data)
+
         return self.cache
 
     def __set__(self, settings, value):
