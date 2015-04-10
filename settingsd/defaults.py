@@ -11,6 +11,10 @@ SETTINGSD_NS = '__dict__'
 
 SETTINGSD_BASES = ['settingsd.base:BaseSettings']
 
+SETTINGSD_FINDERS = [
+    'settingsd.finders:directory',
+    ]
+
 SETTINGSD_LOADERS = [
     'settingsd.loaders:from_key',
     'settingsd.loaders:from_mime',
