@@ -197,7 +197,8 @@ class Settingsd(Namespace, collections.OrderedDict):
                     keys.update(part)
                     cache_key = (keys['index'], keys['name'])
                     if cache_key not in cache_out:
-                        cache_in[cache_key] = keys
+                        if cache_key not in cache_in:
+                            cache_in[cache_key] = keys
 
             return cache_in, cache_out
 
