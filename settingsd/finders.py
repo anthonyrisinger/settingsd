@@ -16,7 +16,7 @@ def directory(settings, path):
         return None
 
     parts = list()
-    for name in os.listdir(path):
+    for name in sorted(os.listdir(path)):
         part = {'uri': os.path.join(path, name)}
 
         def get_data(part=part):
@@ -40,7 +40,7 @@ def zipfile(settings, path):
         return None
 
     parts = list()
-    for info in importer._files.values():
+    for info in sorted(importer._files.values()):
         if not info[0].startswith(path):
             # random item in archive we don't care about
             continue
