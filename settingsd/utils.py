@@ -9,7 +9,6 @@ from __future__ import print_function
 
 import collections
 import os.path
-import mimetypes
 import re
 import sys
 
@@ -103,7 +102,6 @@ def keys_from_uri(uri):
     keys = {'uri': uri}
     keys['head'], keys['tail'] = os.path.split(keys['uri'])
     keys['name'], keys['ext'] = os.path.splitext(keys['tail'])
-    keys['mime'] = mimetypes.guess_type(keys['tail'])[0]
     matcher = re.compile('^_?([0-9]+)[-_](.+)$')
     match = matcher.match(keys['name'])
     if not match:

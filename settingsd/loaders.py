@@ -14,11 +14,6 @@ def from_key(settings, keys):
     return loader
 
 
-def from_mime(settings, keys):
-    loader = _load_from(settings, keys, 'mime')
-    return loader
-
-
 def from_ext(settings, keys):
     loader = _load_from(settings, keys, 'ext')
     return loader
