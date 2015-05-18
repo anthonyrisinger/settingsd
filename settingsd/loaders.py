@@ -50,8 +50,9 @@ def python(settings, keys):
 def json(settings, keys):
     from json import loads
     ns = utils.namespace(settings)
-    data = keys['get_data']()
-    new_ns = loads(data)
+    new_ns = keys['get_data']()
+    if not hasattr(new_ns, 'keys'):
+        new_ns = loads(new_ns)
     # ensure stable load ordering
     for k in new_ns:
         ns[k] = new_ns[k]
