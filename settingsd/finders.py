@@ -54,3 +54,21 @@ def zipfile(settings, path):
         parts.append(part)
 
     return parts
+
+
+def env(settings, path):
+    if not path.startswith('env://'):
+        return None
+
+    from urllib2 import urlparse
+
+    part = {'uri': path}
+    env_url = urlparse.urlparse(path)
+
+    def get_data(part=part):
+        print(settings)
+        return {}
+
+    part['get_data'] = get_data
+
+    return [part]
