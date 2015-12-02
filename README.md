@@ -13,28 +13,34 @@ sctl.d`, `/etc/pam.d`, etc), but is not necessary. Without delving into implemen
 to behave like this:
 
 ```python
-__path__ = ['settings.d']
-# settings.d/01-apple.py
-APPLE_COLOR = 'red'
-# settings.d/02-banana.py
-BANANA_COLOR = 'yellow'
-# settings.d/03-production.py
-__path__.insert(0, '/production/settings.d')
-# settings.d/04-orange.py (NOT LOADED!)
-#ORANGE_COLOR = 'orange'
-# /production/settings.d/04-orange.py
-ORANGE_COLOR = 'purple'
-# settings.d/05-tomato.py
-if not TOMATO_COLOR:
- # while loading, NameError -> None
- TOMATO_COLOR = 'red'
+Class ApplicationSettings(type.ModuleType):
+
+    __path__ = ['settings.d']
+    # settings.d/01-apple.py
+    APPLE_COLOR = 'red'
+    # settings.d/02-banana.py
+    BANANA_COLOR = 'yellow'
+    # settings.d/03-production.py
+    __path__.insert(0, '/production/settings.d')
+    # settings.d/04-orange.py (NOT LOADED!)
+    #ORANGE_COLOR = 'orange'
+    # /production/settings.d/04-orange.py
+    ORANGE_COLOR = 'purple'
+    # settings.d/05-tomato.py
+    if not TOMATO_COLOR:
+        # NameErrors transformed into None during assembly
+        TOMATO_COLOR = 'red'
+
+sys.modules['application.settings'] = ApplicationSettings()
 ```
 
 Per above, the flow is roughly:
 
-  * use __path__ to locate directories to scan
-  * identify all "submodules" and sort by name
-  * execute each module in the same primary namespace
+  * Use `__path__` to locate directories to scan
+  * Identify all "modules" and sort by name
+  * Execute selected "modules" in the same primary namespace
+  * Convert said namespace to a new `type()`
+  * Create one instance and install into `sys.modules`
 
 ## How to use
 Setup settingsd from your __init__.py:
@@ -50,72 +56,36 @@ ettingsd will use that to compute a default search path. You may control the sea
 ```python
 settings = settingsd.install(__name__, __path__=['settings.d'])
 ```
+Keywords passed to install(...) simply seed the namespace.
 
-Any keywords passed to install(...) will be preferred and set on your settings module. You may also use list
-methods to affect __path__:
-
+settingsd allows you to import descriptors and anything else within part files:
 ```python
-settings.append('/home/me/settings.d')
+from settingsd.extras.django import ConfigureApps
+app = ConfigureApps()
 ```
-
-Common some dynamic paths have symbolic names for convenience:
+`ConfigureApps` is a property "activated" naturally when the namespace is converted to a class:
 ```python
-settings.append('@home')
-```
-
-Which expands to `${XDG_CONFIG_HOME}/{__name__}/settings.d`
-
-## Parts
-Part files are any file within the search path matching the following pattern:
-`([0-9])+(@[a-z]+)?-[^.].py`
-IOW, it must start with a number, followed by an optional load hint, a dash, a string of pretty much anything except
-periods, and end in `.py`. A future version of settingsd will allow part files to end in any suffix, and select an appropriate load hint accordingly (eg. a txt file would use the @path hint).
-
-_Examples_:
-```
-10-rubber-bands.py
-99-debug.py
-35@path-HTTPS-CERT.py
-```
-
-_Load Hints_:
-
-Aside from importing python files, settingsd allows you to map a file path or contents to a key by using a "load
-hint". A load hint instructs settingsd on how to handle the part file. The default hint is @code, which aptly means
-"execute this file as python code".
-
-The following hints are currently supported:
-
-`@code`: execute the part within the primary namespace
-
-Example:
-`99@code-debug.py`
-
-`@path`: use the part's name to derive a key, and set the key to the parts absolute path
-
-Example:
-`35@path-HTTPS-CERT.py`
-
-`@file`: use the part's name to derive a key, and set the key to the parts contents
-
-Example:
-`35@file-IDP-CERT.py`
-
-Hints exist to boost interoperability with external tools; a tool like Chef can simply drop a standard PEM certificate in
-the search path with the appropriate name and it will be loaded into the desired key for use by the application.
-
-## Future
-
-Soon settingsd will allow you to import descriptors and anything else into your part files, and upon
-assembly/execution, create a new type(...) for you. This means, from a part file, you can do something like:
-```python
-from settingsd.contrib.django import AppFinder
-app = AppFinder()
-```
-Then in your application do something like this:
-```python
-from payback import settings
+from application import settings
 groups = settings.app.access.Group.objects.all()
 ```
-IOW, your part files will literally behave as if they we executed within a class definition, and an instance of the
-resulting class will become your settings object!
+
+Part files behave as if they were executed within a class definition so you are free to define settings-bound methods:
+```python
+def echo(settings, *args, **kwds):
+    print((settings, args, kwds))
+```
+And the usercode:
+```python
+from application import settings
+groups = settings.echo('hello', who=me)
+```
+
+Special methods are no different:
+```python
+from settingsd.extras.django import fallback_to_defaults as __getattr__
+```
+Usercode:
+```
+from application import settings
+settings.SOME_DEFAULT_DJANGO_SETTING_YOU_DID_NOT_DEFINE_BUT_WILL_EXIST_ANYWAY
+```
