@@ -164,8 +164,8 @@ def ns_prepare(sources, install=True):
     if '__path__' not in ns:
         ns['__path__'] = list()
         if ns['__file__']:
-            from . import path
-            item = path.default(ns)
+            from . import pathing
+            item = pathing.default(ns)
             ns['__path__'].append(item)
 
     for i, item in enumerate(ns['__path__']):

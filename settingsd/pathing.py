@@ -14,7 +14,7 @@ def _name_to_parts(name):
     return (appdir, suffix)
 
 
-def root(ns, path, create=True, mode=0644):
+def root(ns, path, create=True, mode=0o644):
     """
     Append an absolute path to ns['__path__']
     """
@@ -30,7 +30,7 @@ def root(ns, path, create=True, mode=0644):
     return path_root
 
 
-def home(ns, path=None, create=True, mode=0644, xdg=True):
+def home(ns, path=None, create=True, mode=0o644, xdg=True):
     """
     Append a path to ns['__path__'] derived from $XDG_CONFIG_HOME
     """
@@ -57,7 +57,7 @@ def home(ns, path=None, create=True, mode=0644, xdg=True):
     return path_home
 
 
-def default(ns, path=None, create=True, mode=0644):
+def default(ns, path=None, create=True, mode=0o644):
     """
     Append a path to ns['__path__'] derived from ns['__file__']
     """

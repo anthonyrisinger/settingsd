@@ -22,7 +22,7 @@ def trace(self, key=None):
         if key in ns.dist:
             return ns.dist[key]
         return tuple()
-    return tuple(ns.dist.iteritems())
+    return tuple(ns.dist.items())
 
 
 def source(self, key=None):
@@ -31,7 +31,7 @@ def source(self, key=None):
         if key in ns.path:
             return ns.path[key]
         return tuple()
-    return tuple(ns.path.iteritems())
+    return tuple(ns.path.items())
 
 
 def show(self, prefix='[settings.d]', file=None):
