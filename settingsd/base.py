@@ -79,6 +79,9 @@ class Settingsd(Namespace, collections.OrderedDict):
                 copy=True,
                 )
         except AttributeError as e:
+            if '__builtins__' in self and key in self['__builtins__']:
+                # Python 2.x seems to do this for us
+                return self['__builtins__'][key]
             raise KeyError(key)
 
         # FIXME: if we dont self[key] = item, users are unable to override
