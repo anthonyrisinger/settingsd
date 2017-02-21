@@ -18,6 +18,9 @@ tmp
 /packages/
 /build/
 
+/.venv
+/.eggs
+
 *.egg-info/
 *.dist-info/
 
