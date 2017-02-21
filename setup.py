@@ -7,10 +7,10 @@ from setuptools import setup
 setup(
     zip_safe=True,
     name='settingsd',
-    version='0.8.13',
+    version='0.9',
     description='settings.d',
     long_description='settings.d',
-    url='https://github.com/xtfxme/settingsd',
+    url='https://github.com/anthonyrisinger/settingsd',
     author='C Anthony Risinger',
     author_email='c@anthonyrisinger.com',
     license='BSD',
